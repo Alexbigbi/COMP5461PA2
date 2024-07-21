@@ -41,13 +41,15 @@ public class BlockManager
 	/**
 	 * s1 is to make sure phase I for all is done before any phase II begins
 	 */
-	private static Semaphore s1 = new Semaphore(-10);
+	private static Semaphore s1 = new Semaphore(-9);
 
 	/**
 	 * s2 is for use in conjunction with Thread.turnTestAndSet() for phase II proceed
 	 * in the thread creation order
 	 */
 	private static Semaphore s2 = new Semaphore(1);
+
+	private static boolean printPhase1Done = true;
 
 
 	// The main()
@@ -60,6 +62,8 @@ public class BlockManager
 			System.out.println("Initial value of top = " + soStack.getTop() + ".");
 			System.out.println("Initial value of stack top = " + soStack.pick() + ".");
 			System.out.println("Main thread will now fork several threads.");
+
+			
 
 			/*
 			 * The birth of threads
@@ -193,8 +197,20 @@ public class BlockManager
 			mutex.Signal();
 
 
+			s1.Signal();
 		
+			s1.Wait();
+
+			//attempt to print phase1 is done
+			mutex.Wait();
+				if(printPhase1Done){
+					System.out.println("----All threads have finished phase 1 sucesfully-----");
+					printPhase1Done = false;
+				}
+			mutex.Signal();
+
 			phase2();
+			s1.Signal();
 			
 
 
@@ -255,7 +271,22 @@ public class BlockManager
 			}
 			mutex.Signal();
 
+
+			s1.Signal();
+
+			s1.Wait();
+
+			//attempt to print phase1 is done
+			mutex.Wait();
+				if(printPhase1Done){
+					System.out.println("----All threads have finished phase 1 sucesfully-----");
+					printPhase1Done = false;
+				}
+			mutex.Signal();
+
+
 			phase2();
+			s1.Signal();
 
 
 			System.out.println("ReleaseBlock thread [TID=" + this.iTID + "] terminates.");
@@ -301,8 +332,21 @@ public class BlockManager
 				System.exit(1);
 			}
 			mutex.Signal();
+			s1.Signal();
+
+			s1.Wait();
+
+			//attempt to print phase1 is done
+			mutex.Wait();
+				if(printPhase1Done){
+					System.out.println("\n\n----All threads have finished phase 1 sucesfully-----\n\n");
+					printPhase1Done = false;
+				}
+			mutex.Signal();
+
 
 			phase2();
+			s1.Signal();
 
 		}
 	} // class CharStackProber
