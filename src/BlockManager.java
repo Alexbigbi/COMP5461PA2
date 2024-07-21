@@ -32,7 +32,7 @@ public class BlockManager
 	/**
 	 * For atomicity
 	 */
-	//private static Semaphore mutex = new Semaphore(...);
+	private static Semaphore mutex = new Semaphore(1);
 
 	/*
 	 * For synchronization
@@ -41,13 +41,13 @@ public class BlockManager
 	/**
 	 * s1 is to make sure phase I for all is done before any phase II begins
 	 */
-	//private static Semaphore s1 = new Semaphore(...);
+	private static Semaphore s1 = new Semaphore(-10);
 
 	/**
 	 * s2 is for use in conjunction with Thread.turnTestAndSet() for phase II proceed
 	 * in the thread creation order
 	 */
-	//private static Semaphore s2 = new Semaphore(...);
+	private static Semaphore s2 = new Semaphore(1);
 
 
 	// The main()
@@ -155,14 +155,15 @@ public class BlockManager
 		{
 			System.out.println("AcquireBlock thread [TID=" + this.iTID + "] starts executing.");
 
-
+			mutex.Wait();
 			phase1();
 
-
+			
 			try
 			{
 				System.out.println("AcquireBlock thread [TID=" + this.iTID + "] requests Ms block.");
-
+				
+			
 				this.cCopy = soStack.pop();
 
 				System.out.println
@@ -189,8 +190,12 @@ public class BlockManager
 				reportException(e);
 				System.exit(1);
 			}
+			mutex.Signal();
 
+
+		
 			phase2();
+			
 
 
 			System.out.println("AcquireBlock thread [TID=" + this.iTID + "] terminates.");
@@ -212,12 +217,13 @@ public class BlockManager
 		{
 			System.out.println("ReleaseBlock thread [TID=" + this.iTID + "] starts executing.");
 
-
+			mutex.Wait();
 			phase1();
 
-
+			
 			try
 			{
+				
 				if(soStack.isEmpty() == false)
 					this.cBlock = (char)(soStack.pick() + 1);
 
@@ -247,7 +253,7 @@ public class BlockManager
 				reportException(e);
 				System.exit(1);
 			}
-
+			mutex.Signal();
 
 			phase2();
 
@@ -264,9 +270,11 @@ public class BlockManager
 	{
 		public void run()
 		{
+
+			mutex.Wait();
 			phase1();
 
-
+			
 			try
 			{
 				for(int i = 0; i < siThreadSteps; i++)
@@ -292,7 +300,7 @@ public class BlockManager
 				reportException(e);
 				System.exit(1);
 			}
-
+			mutex.Signal();
 
 			phase2();
 
