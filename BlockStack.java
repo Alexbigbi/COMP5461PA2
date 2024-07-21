@@ -31,10 +31,14 @@ class BlockStack
 	 */
 	public int iTop  = 3;
 
+	/*
+	 *  Stack access counter
+	 */
+	private int stackAccessCounter  = 0;
 	/**
 	 * stack[0:5] with four defined values
 	 */
-	public char acStack[] = new char[] {'a', 'b', 'c', 'd', '$', '$'};
+	public char acStack[] = new char[] {'a', 'b', 'c', 'd', '*', '*'};
 
 	/**
 	 * Default constructor
@@ -59,7 +63,7 @@ class BlockStack
 			for(int i = 0; i < piSize - 2; i++)
 				this.acStack[i] = (char)('a' + i);
 
-			this.acStack[piSize - 2] = this.acStack[piSize - 1] = '$';
+			this.acStack[piSize - 2] = this.acStack[piSize - 1] = '*';
 
 			this.iTop = piSize - 3;
                         this.iSize = piSize;
@@ -72,7 +76,9 @@ class BlockStack
 	 */
 	public char pick()
 	{
+		++this.stackAccessCounter;
 		return this.acStack[this.iTop];
+	
 	}
 
 	/**
@@ -81,6 +87,7 @@ class BlockStack
 	 */
 	public char getAt(final int piPosition)
 	{
+		++this.stackAccessCounter;
 		return this.acStack[piPosition];
 	}
 
@@ -89,6 +96,7 @@ class BlockStack
 	 */
 	public void push(final char pcBlock)
 	{
+		++this.stackAccessCounter;
 		this.acStack[++this.iTop] = pcBlock;
 	}
 
@@ -98,10 +106,20 @@ class BlockStack
 	 */
 	public char pop()
 	{
+		++this.stackAccessCounter;
 		char cBlock = this.acStack[this.iTop];
-		this.acStack[this.iTop--] = '$'; // Leave prev. value undefined
+		this.acStack[this.iTop--] = '*'; // Leave prev. value undefined
 		return cBlock;
 	}
+
+
+	public void printCtr(){
+
+		System.out.println("Current counter is: " + this.stackAccessCounter);
 }
+
+}
+
+
 
 // EOF

@@ -64,13 +64,24 @@ public class BlockManager
 			/*
 			 * The birth of threads
 			 */
-			AcquireBlock ab1 = new AcquireBlock();
+
+			 /*
+			  Ideas:
+		
+			  	hunt each section where there might be an access to the soStack and use s1 to control the access to this
+				as for s2, initilize the semaphore to -10, each thread will signal once it reaches the and and will require a
+				access to s2 to access the second phase, therefore all threads must finish before being able to access s2
+				once s2 can be acquired we use testandturn, if true, then advance to phase 2 and release lock, if false, just 
+				release the lock
+
+			  */
+			AcquireBlock ab1 = new AcquireBlock();  
 			AcquireBlock ab2 = new AcquireBlock();
 			AcquireBlock ab3 = new AcquireBlock();
 
 			System.out.println("main(): Three AcquireBlock threads have been created.");
 
-			ReleaseBlock rb1 = new ReleaseBlock();
+			ReleaseBlock rb1 = new ReleaseBlock(); 
 			ReleaseBlock rb2 = new ReleaseBlock();
 			ReleaseBlock rb3 = new ReleaseBlock();
 
@@ -151,7 +162,7 @@ public class BlockManager
 		 */
 		private char cCopy;
 
-		public void run()
+		public void run()//syncronize this whole section with the semaphore? first i need to acquire the block, do what i need to do, and until then i can attempt to start phase 2
 		{
 			System.out.println("AcquireBlock thread [TID=" + this.iTID + "] starts executing.");
 
@@ -163,7 +174,7 @@ public class BlockManager
 			{
 				System.out.println("AcquireBlock thread [TID=" + this.iTID + "] requests Ms block.");
 
-				this.cCopy = soStack.pop();
+				this.cCopy = soStack.pop(); //Critical section?
 
 				/*System.out.println
 				(
@@ -190,6 +201,10 @@ public class BlockManager
 				System.exit(1);
 			}
 
+			
+
+			//confirm if its my turn to start phase2 here
+			//use turnTestandSet and semaphore 2
 			phase2();
 
 
@@ -213,7 +228,7 @@ public class BlockManager
 			System.out.println("ReleaseBlock thread [TID=" + this.iTID + "] starts executing.");
 
 
-			phase1();
+			phase1(); 
 
 
 			try
@@ -248,7 +263,9 @@ public class BlockManager
 				System.exit(1);
 			}
 
+			//release s1 so that other threads can work (signal)
 
+			//could a sempahore that starts at 10 be used? so that every time a thread calls wait
 			phase2();
 
 
