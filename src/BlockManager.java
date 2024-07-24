@@ -47,7 +47,7 @@ public class BlockManager
 	 * s2 is for use in conjunction with Thread.turnTestAndSet() for phase II proceed
 	 * in the thread creation order
 	 */
-	private static Semaphore s2 = new Semaphore(1);
+	private static Semaphore s2 = new Semaphore(9);
 
 	private static boolean printPhase1Done = true;
 
@@ -200,6 +200,7 @@ public class BlockManager
 			s1.Signal();
 		
 			s1.Wait();
+			s1.Signal();
 
 			//attempt to print phase1 is done
 			mutex.Wait();
@@ -209,8 +210,34 @@ public class BlockManager
 				}
 			mutex.Signal();
 
-			phase2();
-			s1.Signal();
+
+			//s2.Wait();
+            try{
+            while (!turnTestAndSet()) {
+                s2.Wait();
+                //System.out.println("Current TID:  " +  this.iTID);
+                Thread.sleep(1000);
+                Thread.yield();
+                //Thread.onSpinWait();
+
+              
+                //s1.Signal();
+                s2.Signal();
+
+                //s2.Wait();
+            }
+        }catch(Exception e)
+        {
+            reportException(e);
+            System.exit(1);
+        }
+		
+			mutex.Wait();
+			System.out.println("Thread [TID=" + this.iTID + "] is executing phase 2.");
+            phase2();
+			mutex.Signal();
+            //s2.Signal();
+		
 			
 
 
@@ -275,6 +302,7 @@ public class BlockManager
 			s1.Signal();
 
 			s1.Wait();
+			s1.Signal();
 
 			//attempt to print phase1 is done
 			mutex.Wait();
@@ -284,9 +312,33 @@ public class BlockManager
 				}
 			mutex.Signal();
 
-
-			phase2();
-			s1.Signal();
+			//s2.Wait();
+            try{
+				while (!turnTestAndSet()) {
+					s2.Wait();
+					//System.out.println("Current TID:  " +  this.iTID);
+					Thread.sleep(1000);
+					Thread.yield();
+					//Thread.onSpinWait();
+	
+				  
+					//s1.Signal();
+					s2.Signal();
+	
+					//s2.Wait();
+				}
+			}catch(Exception e)
+			{
+				reportException(e);
+				System.exit(1);
+			}
+	
+				mutex.Wait();
+				System.out.println("Thread [TID=" + this.iTID + "] is executing phase 2.");
+				phase2();
+				mutex.Signal();
+				//s2.Signal();
+		
 
 
 			System.out.println("ReleaseBlock thread [TID=" + this.iTID + "] terminates.");
@@ -335,6 +387,7 @@ public class BlockManager
 			s1.Signal();
 
 			s1.Wait();
+			s1.Signal();
 
 			//attempt to print phase1 is done
 			mutex.Wait();
@@ -345,8 +398,33 @@ public class BlockManager
 			mutex.Signal();
 
 
-			phase2();
-			s1.Signal();
+			//s2.Wait();
+            try{
+				while (!turnTestAndSet()) {
+					s2.Wait();
+					//System.out.println("Current TID:  " +  this.iTID);
+					Thread.sleep(1000);
+					Thread.yield();
+					//Thread.onSpinWait();
+	
+				  
+					//s1.Signal();
+					s2.Signal();
+	
+					//s2.Wait();
+				}
+			}catch(Exception e)
+			{
+				reportException(e);
+				System.exit(1);
+			}
+
+				mutex.Wait();
+				System.out.println("Thread [TID=" + this.iTID + "] is executing phase 2.");	
+				phase2();
+				mutex.Signal();
+				//s2.Signal();
+	
 
 		}
 	} // class CharStackProber
