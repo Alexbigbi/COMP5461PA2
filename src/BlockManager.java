@@ -211,27 +211,24 @@ public class BlockManager
 			mutex.Signal();
 
 
-			//s2.Wait();
             try{
+			
             while (!turnTestAndSet()) {
                 s2.Wait();
-                //System.out.println("Current TID:  " +  this.iTID);
+                System.out.println("Current TID	:  " +  this.iTID + " is not ready to execute...");
                 Thread.sleep(1000);
                 Thread.yield();
-                //Thread.onSpinWait();
 
               
-                //s1.Signal();
                 s2.Signal();
 
-                //s2.Wait();
             }
         }catch(Exception e)
         {
             reportException(e);
             System.exit(1);
         }
-		
+
 			mutex.Wait();
 			System.out.println("Thread [TID=" + this.iTID + "] is executing phase 2.");
             phase2();
@@ -316,16 +313,14 @@ public class BlockManager
             try{
 				while (!turnTestAndSet()) {
 					s2.Wait();
-					//System.out.println("Current TID:  " +  this.iTID);
+					System.out.println("Current TID	:  " +  this.iTID + " is not ready to execute...");
+
 					Thread.sleep(1000);
 					Thread.yield();
-					//Thread.onSpinWait();
 	
 				  
-					//s1.Signal();
 					s2.Signal();
 	
-					//s2.Wait();
 				}
 			}catch(Exception e)
 			{
@@ -337,7 +332,6 @@ public class BlockManager
 				System.out.println("Thread [TID=" + this.iTID + "] is executing phase 2.");
 				phase2();
 				mutex.Signal();
-				//s2.Signal();
 		
 
 
@@ -398,20 +392,20 @@ public class BlockManager
 			mutex.Signal();
 
 
-			//s2.Wait();
+			
             try{
 				while (!turnTestAndSet()) {
 					s2.Wait();
-					//System.out.println("Current TID:  " +  this.iTID);
+					System.out.println("Current TID	:  " +  this.iTID + " is not ready to execute...");
 					Thread.sleep(1000);
 					Thread.yield();
-					//Thread.onSpinWait();
+					
 	
 				  
-					//s1.Signal();
+		
 					s2.Signal();
 	
-					//s2.Wait();
+				
 				}
 			}catch(Exception e)
 			{
@@ -423,7 +417,7 @@ public class BlockManager
 				System.out.println("Thread [TID=" + this.iTID + "] is executing phase 2.");	
 				phase2();
 				mutex.Signal();
-				//s2.Signal();
+				
 	
 
 		}
